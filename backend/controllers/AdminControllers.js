@@ -10,6 +10,17 @@ const adminLogin = async (req, res) => {
   res.status(200).json({ message: "Login successful", admin });
 };
 
+const adminSignup = async (req, res) => {
+  try {
+    const admin = new Admin(req.body);
+    await admin.save();
+    res.status(201).json(admin);
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ message: 'Email already registered' });
+    res.status(500).json({ message: 'Registration failed', error: err.message });
+  }
+};
+
 const getAllSellers = async (req, res) => {
   const sellers = await Seller.find();
   res.status(200).json(sellers);
@@ -32,4 +43,4 @@ const deleteBookAdmin = async (req, res) => {
   res.status(200).json({ message: "Book removed by admin" });
 };
 
-module.exports = { adminLogin, getAllSellers, approveSeller, getAllUsers, deleteBookAdmin };
+module.exports = { adminSignup, adminLogin, getAllSellers, approveSeller, getAllUsers, deleteBookAdmin };

@@ -3,9 +3,15 @@ const Book = require('../models/BookSchema');
 const Order = require('../models/MyOrderSchema');
 
 const userSignup = async (req, res) => {
-  const user = new User(req.body);
-  await user.save();
-  res.status(201).json(user);
+  try {
+    const user = new User(req.body);
+    await user.save();
+    res.status(201).json(user);
+  } catch (err) {
+    // Handle duplicate email error from MongoDB
+    if (err.code === 11000) return res.status(400).json({ message: 'Email already registered' });
+    res.status(500).json({ message: 'Registration failed', error: err.message });
+  }
 };
 
 const userLogin = async (req, res) => {

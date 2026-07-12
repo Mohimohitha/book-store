@@ -20,9 +20,13 @@ function Login() {
       const response = await axios.post(endpoint, { email, password });
       
       if (response.status === 200) {
-        // Save user info to keep them logged in
-        localStorage.setItem('userRole', role);
-        localStorage.setItem('userId', response.data[role]._id);
+        // Extract user object robustly (controllers return e.g. { user } | { seller } | { admin })
+        const loggedUser = response.data?.[role] || response.data?.user || response.data?.seller || response.data?.admin || response.data;
+
+        if (loggedUser && loggedUser._id) {
+          localStorage.setItem('userRole', role);
+          localStorage.setItem('userId', loggedUser._id);
+        }
 
         // Redirect to their specific dashboard
         if (role === 'admin') navigate('/admin');

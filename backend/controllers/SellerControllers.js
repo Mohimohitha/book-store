@@ -3,9 +3,14 @@ const Book = require('../models/BookSchema');
 const Order = require('../models/MyOrderSchema');
 
 const sellerSignup = async (req, res) => {
-  const seller = new Seller(req.body);
-  await seller.save();
-  res.status(201).json(seller);
+  try {
+    const seller = new Seller(req.body);
+    await seller.save();
+    res.status(201).json(seller);
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ message: 'Email already registered' });
+    res.status(500).json({ message: 'Registration failed', error: err.message });
+  }
 };
 
 const sellerLogin = async (req, res) => {

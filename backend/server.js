@@ -17,6 +17,29 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/user', userRoutes);
 
+// Debug: print registered routes (guarded)
+setTimeout(() => {
+  try {
+    const routes = [];
+    if (app && app._router && Array.isArray(app._router.stack)) {
+      app._router.stack.forEach((middleware) => {
+        if (middleware.route) {
+          routes.push(middleware.route.path);
+        } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
+          middleware.handle.stack.forEach((handler) => {
+            if (handler.route) routes.push(handler.route.path);
+          });
+        }
+      });
+    } else {
+      console.log('No routes registered yet');
+    }
+    console.log('Registered routes:', routes);
+  } catch (err) {
+    console.log('Error listing routes:', err.message);
+  }
+}, 500);
+
 connectDB();
 
 const PORT = process.env.PORT || 8000;

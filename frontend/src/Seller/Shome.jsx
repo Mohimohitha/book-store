@@ -73,27 +73,27 @@ function Shome() {
     <div className="min-h-screen bg-gray-50 flex font-sans">
       
       {/* Seller Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col shadow-xl hidden md:flex">
-        <div className="p-6 border-b border-gray-800">
-          <h2 className="text-xl font-serif font-bold">Seller Central</h2>
-          <p className="text-xs text-gray-400 mt-1">Manage your inventory</p>
+      <aside className="hidden w-72 min-h-screen flex-col bg-gray-950 text-white shadow-2xl md:flex">
+        <div className="border-b border-gray-800 p-6">
+          <h2 className="font-serif text-xl font-bold">Seller Central</h2>
+          <p className="mt-1 text-sm text-gray-400">Manage your inventory with clarity.</p>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <button 
+        <nav className="flex-1 space-y-2 p-4">
+          <button
             onClick={() => setActiveTab('add')}
-            className={`w-full text-left px-4 py-2.5 rounded transition font-medium text-sm ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'add' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
           >
             + Add New Book
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('inventory')}
-            className={`w-full text-left px-4 py-2.5 rounded transition font-medium text-sm ${activeTab === 'inventory' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'inventory' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
           >
             My Inventory
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('orders')}
-            className={`w-full text-left px-4 py-2.5 rounded transition font-medium text-sm ${activeTab === 'orders' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'orders' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
           >
             Customer Orders
           </button>
