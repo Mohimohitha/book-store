@@ -48,8 +48,11 @@ Clone the repository.
 Install dependencies:
 
 Bash
+
 cd frontend && npm install
+
 cd ../backend && npm install
+
 Environment Variables: Create a .env file in the backend folder and add:
 
 MONGODB_URI=<your_connection_string>
@@ -63,6 +66,7 @@ Backend: npm run server (or node server.js)
 Frontend: npm run dev
 
 👥 Credits & Contributions
+
 This project was developed with a focus on full-stack MERN architecture.
 
 Lead Developer & Architecture: Bramhanapalli Mohitha
