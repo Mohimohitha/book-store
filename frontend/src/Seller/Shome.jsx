@@ -1,24 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 function Shome() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('add');
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'inventory'; 
+  
   const [message, setMessage] = useState('');
+  const [myBooks, setMyBooks] = useState([]);
+  const [myOrders, setMyOrders] = useState([]);
 
-  // Form State
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    genre: 'Fiction',
-    description: '',
-    price: '',
-    stock: '',
+    title: '', author: '', genre: 'Fiction', description: '', price: '', stock: '',
   });
   const [image, setImage] = useState(null);
 
-  // Security Check: Make sure they are a logged-in seller
   useEffect(() => {
     const role = localStorage.getItem('userRole');
     if (role !== 'seller') {
@@ -26,21 +23,40 @@ function Shome() {
     }
   }, [navigate]);
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (activeTab === 'inventory') fetchInventory();
+    if (activeTab === 'orders') fetchOrders();
+  }, [activeTab]);
+
+  const fetchInventory = async () => {
+    const sellerId = localStorage.getItem('userId');
+    const response = await axios.get(`http://localhost:8000/api/seller/my-products/${sellerId}`);
+    if (response.data) {
+      setMyBooks(response.data.books || response.data); 
+    }
   };
 
-  const handleFileChange = (e) => {
-    setImage(e.target.files[0]);
+  const fetchOrders = async () => {
+    const sellerId = localStorage.getItem('userId');
+    const response = await axios.get(`http://localhost:8000/api/seller/orders/${sellerId}`);
+    if (response.data) {
+      setMyOrders(response.data);
+    }
   };
+
+  const handleDeleteBook = async (id) => {
+    await axios.delete(`http://localhost:8000/api/seller/delete-book/${id}`);
+    fetchInventory();
+  };
+
+  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleFileChange = (e) => setImage(e.target.files[0]);
 
   const handleAddBook = async (e) => {
     e.preventDefault();
     setMessage('');
     
     const sellerId = localStorage.getItem('userId');
-
-    // We must use FormData because we are sending a physical file
     const data = new FormData();
     data.append('title', formData.title);
     data.append('author', formData.author);
@@ -51,62 +67,25 @@ function Shome() {
     data.append('sellerId', sellerId);
     if (image) data.append('image', image);
 
-    try {
-      const response = await axios.post('http://localhost:8000/api/seller/add-book', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      
-      if (response.status === 201) {
-        setMessage('Book successfully added to your store!');
-        // Reset form
-        setFormData({ title: '', author: '', genre: 'Fiction', description: '', price: '', stock: '' });
-        setImage(null);
-        e.target.reset(); // Clears the file input visually
-      }
-    } catch (err) {
-      setMessage('Failed to add book. Please try again.');
-      console.error(err);
+    const response = await axios.post('http://localhost:8000/api/seller/add-book', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    if (response.status === 201 || response.status === 200) {
+      setMessage('Book successfully added to your store!');
+      setFormData({ title: '', author: '', genre: 'Fiction', description: '', price: '', stock: '' });
+      setImage(null);
+      e.target.reset(); 
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans">
-      
-      {/* Seller Sidebar */}
-      <aside className="hidden w-72 min-h-screen flex-col bg-gray-950 text-white shadow-2xl md:flex">
-        <div className="border-b border-gray-800 p-6">
-          <h2 className="font-serif text-xl font-bold">Seller Central</h2>
-          <p className="mt-1 text-sm text-gray-400">Manage your inventory with clarity.</p>
-        </div>
-        <nav className="flex-1 space-y-2 p-4">
-          <button
-            onClick={() => setActiveTab('add')}
-            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'add' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
-          >
-            + Add New Book
-          </button>
-          <button
-            onClick={() => setActiveTab('inventory')}
-            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'inventory' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
-          >
-            My Inventory
-          </button>
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'orders' ? 'bg-white text-gray-950' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
-          >
-            Customer Orders
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 p-8">
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <main className="max-w-7xl mx-auto p-8">
         
         {activeTab === 'add' && (
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-6">List a New Book</h2>
-            
             <form onSubmit={handleAddBook} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,7 +121,7 @@ function Shome() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description / Synopsis</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea name="description" required rows="3" value={formData.description} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-900 focus:border-gray-900 resize-none"></textarea>
               </div>
 
@@ -162,7 +141,6 @@ function Shome() {
                   Publish Book to Store
                 </button>
               </div>
-
             </form>
           </div>
         )}
@@ -170,9 +148,73 @@ function Shome() {
         {activeTab === 'inventory' && (
           <div>
             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-6">My Inventory</h2>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
-              <p>Your listed books will appear here. (Coming next!)</p>
-            </div>
+            {myBooks.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
+                <p>You haven't listed any books yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {myBooks.map((book) => (
+                  <div key={book._id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition">
+                    <div className="h-56 bg-gray-100 overflow-hidden relative">
+                      <img 
+                        src={`http://localhost:8000/uploads/${book.image}`} 
+                        alt={book.title} 
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=No+Cover' }} 
+                      />
+                    </div>
+                    <div className="p-4 flex flex-col flex-grow">
+                      <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">{book.genre}</p>
+                      <h3 className="font-serif text-lg font-semibold mb-1 text-gray-900 line-clamp-1">{book.title}</h3>
+                      
+                      <div className="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold text-gray-900">₹{book.price}</p>
+                          <p className={`text-xs font-semibold ${book.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            {book.stock} in stock
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => handleDeleteBook(book._id)}
+                          className="text-red-500 text-sm font-semibold hover:text-red-700 transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div className="max-w-4xl mx-auto">
+             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-6">Customer Orders</h2>
+             {myOrders.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
+                  <p>No customer orders yet.</p>
+                </div>
+             ) : (
+               <div className="space-y-4">
+                 {myOrders.map((order) => (
+                   <div key={order._id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                     <div className="flex justify-between border-b border-gray-100 pb-4 mb-4">
+                       <span className="font-semibold text-gray-700">Order ID: {order.orderId}</span>
+                       <span className="text-sm text-gray-500">Buyer: {order.userId?.name || 'Unknown'}</span>
+                     </div>
+                     {order.items.map((item, idx) => (
+                       <div key={idx} className="flex justify-between text-sm text-gray-600 py-1">
+                         <span>Book ID: {item.bookId}</span>
+                         <span>Qty: {item.quantity}</span>
+                       </div>
+                     ))}
+                   </div>
+                 ))}
+               </div>
+             )}
           </div>
         )}
 

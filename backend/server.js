@@ -16,6 +16,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/admin', adminRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/user', userRoutes);
+app.use('/uploads', express.static('uploads'));
 
 // Debug: print registered routes (guarded)
 setTimeout(() => {

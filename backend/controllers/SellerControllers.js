@@ -21,11 +21,19 @@ const sellerLogin = async (req, res) => {
 };
 
 const addBook = async (req, res) => {
-  const { title, author, genre, description, price, stock, sellerId } = req.body;
-  const image = req.file ? req.file.filename : '';
-  const book = new Book({ title, author, genre, description, price, stock, image, sellerId });
-  await book.save();
-  res.status(201).json(book);
+  try {
+    const { title, author, genre, description, price, stock, sellerId } = req.body;
+    const image = req.file ? req.file.filename : null;
+
+    const newBook = new Book({
+      title, author, genre, description, price, stock, sellerId, image
+    });
+
+    await newBook.save();
+    res.status(201).json({ message: "Book added successfully", book: newBook });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 
 const getMyProducts = async (req, res) => {
