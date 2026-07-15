@@ -1,10 +1,13 @@
 BookStore Application
+
 A comprehensive MERN stack (MongoDB, Express, React, Node.js) platform designed to provide a secure and efficient book shopping experience for users, with dedicated management interfaces for sellers and administrators.
 
 🚀 Project Overview
+
 The BookStore application streamlines the process of browsing books, managing inventory, and tracking orders. It implements a robust MVC pattern to ensure modularity, security, and scalability.
 
 🏗️ Technical Architecture
+
 The application is built on the following stack:
 
 Frontend: React.js with Tailwind CSS for a responsive, modern UI.
@@ -16,6 +19,7 @@ Database: MongoDB managed via Mongoose schemas.
 Authentication: JWT-based secure user, seller, and admin authentication.
 
 ⚙️ Key Features
+
 Role-Based Access: Specialized dashboards for Users, Sellers, and Admins.
 
 Product Management: Sellers can add, edit, and delete books; Admins manage overall platform integrity.
@@ -25,7 +29,9 @@ Secure Purchasing: Cart management and order tracking services.
 MVC Pattern: Clear separation of concerns between Models, Controllers, and Routes for maintainability.
 
 📂 Project Structure
+
 Plaintext
+
 BOOKSTORE/
 ├── backend/            # Express API, Controllers, Models, Routes
 ├── frontend/           # React Components, Pages, State Management
