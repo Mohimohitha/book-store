@@ -33,10 +33,15 @@ MVC Pattern: Clear separation of concerns between Models, Controllers, and Route
 Plaintext
 
 BOOKSTORE/
+
 ├── backend/            # Express API, Controllers, Models, Routes
+
 ├── frontend/           # React Components, Pages, State Management
+
 ├── .gitignore          # Git tracking configuration
+
 └── README.md           # Project documentation
+
 🛠️ Installation & Setup
 Clone the repository.
 
